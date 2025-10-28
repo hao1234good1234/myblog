@@ -1,0 +1,12 @@
+<h1>所有文章</h1>
+<ul>
+  {% for article in articles %}
+    <li>
+      <h2>{{ article.title }}</h2>
+      <p>{{ article.content|truncatewords:30 }}</p>
+      <small>发布时间：{{ article.created_time }}</small>
+    </li>
+  {% empty %}
+    <li>暂无文章</li>
+  {% endfor %}
+</ul>

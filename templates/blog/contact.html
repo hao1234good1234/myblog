@@ -1,0 +1,11 @@
+<h1>留言表单</h1>
+<form method="post">
+    {% csrf_token %}  <!-- 安全：防止 CSRF 攻击 -->
+    {{ form.as_p }}  <!-- 自动生成所有字段，用 <p> 包裹 -->
+    <button type="submit">提交</button>
+</form>
+<!-- 显示错误信息 -->
+{{ form.non_field_errors }}
+{% for field in form %}
+    {{ field.errors }}  <!-- 显示每个字段的错误 -->
+{% endfor %}

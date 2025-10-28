@@ -1,0 +1,271 @@
+# ##############################################################################
+# # OS Generated
+# ##############################################################################
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.AppleDouble
+.LSOverride
+Icon
+.NetworkIcon
+.fseventsd
+.Metadata
+.pkpass
+
+# Windows
+Thumbs.db
+Thumbs.db:*
+ehthumbs_vista.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+*~
+
+# Temporary files
+*.swp
+*.swo
+.*.swp
+.*.swo
+~$
+
+# ##############################################################################
+# # Python
+# ##############################################################################
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.manifest
+*.spec
+
+# Virtual environments
+venv/
+env/
+ENV/
+.env*/
+.venv*/
+virtualenv/
+.VirtualEnv/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+.coverage_html/
+htmlcov/
+.ruff_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Translations
+*.mo
+*.pot
+
+# Logs
+*.log
+logs/
+logs/*/
+!logs/.gitkeep
+
+# Email backend (during dev)
+/email/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# PEP 582; used by pdm, uv
+__pypackages__/
+
+# ##############################################################################
+# # Django
+# ##############################################################################
+
+# Media and static files (uploaded by users)
+/media/
+/media/*
+!/media/.gitkeep
+
+# Static collected files
+/staticfiles/
+/staticfiles/*
+
+# Database
+db.sqlite3
+db.sqlite3-journal
+*.sqlite3
+*.db
+
+# Settings overrides
+local_settings.py
+settings_local.py
+.env.local
+.env.development
+.env.test
+.env.staging
+.env.production
+
+# Debug toolbar
+.debug_toolbar/
+
+# Sentry
+.sentry_sdk/
+
+# ##############################################################################
+# # PyCharm / JetBrains IDE
+# ##############################################################################
+
+# Ignore all .idea files by default
+.idea/
+
+# But allow sharing some team-wide configurations (optional)
+!.idea/modules.xml
+!.idea/misc.xml
+!.idea/.name
+!.idea/vcs.xml
+!.idea/encodings.xml
+!.idea/gradle.xml
+!.idea/scala.xml
+!.idea/fileTemplates/
+!.idea/codeStyles/
+!.idea/copyright/
+!.idea/dictionaries/
+!.idea/inspectionProfiles/
+!.idea/scopes/
+!.idea/schemas/
+!.idea/testData/
+!.idea/terminal/
+!.idea/wizard/
+!.idea/workingSets/
+
+# Explicitly ignore user-specific files (even if above allows .idea/)
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/shelf/
+.idea/dataSources.local.xml
+.idea/runConfigurations/
+.idea/scratch/
+.idea/markdown-navigator.xml
+.idea/markdown-navigator/
+.idea/ProjectCodeStyleSettings.xml
+.idea/jsLibraryMappings.xml
+.idea/dictionaries/*.xml
+!*.iml
+*.iml
+
+# Editor-based run/debug configurations
+*.run/
+
+# Temporary files created by PyCharm
+__jb_tmp_*/
+__jb_old_*/
+
+# ##############################################################################
+# # Environment & Secrets
+# ##############################################################################
+
+# Environment variables
+.env
+.env.backup
+.env.tpl
+.env.example
+.env.*.local
+.env.*.dev
+.env.*.test
+.env.*.staging
+.env.*.prod
+
+# Secret keys
+secret.txt
+key.pem
+cert.pem
+*.pem
+*.key
+*.crt
+
+# ##############################################################################
+# # Testing & CI
+# ##############################################################################
+
+# Tox
+.tox/
+!tox.ini
+
+# Coverage
+.coverage
+coverage.xml
+htmlcov/
+.covertester/
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+compose.yaml
+!docker-compose.yml
+
+# Kubernetes
+.kube/config
+
+# GitLab CI
+.gitlab-ci.yml
+
+# GitHub Actions
+.github/workflows/test.yml
+
+# Jenkins
+Jenkinsfile
+
+# ##############################################################################
+# # Optional: Keep empty dirs with .gitkeep
+# ##############################################################################
+
+# Migrations must be tracked
+*/migrations/*.py
+!*/migrations/__init__.py
+!*/migrations/.gitkeep
+
+# Logs and media (empty dirs)
+logs/.gitkeep
+media/.gitkeep
