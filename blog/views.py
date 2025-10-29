@@ -11,7 +11,11 @@ from django.utils.decorators import method_decorator
 from .models import Article
 from datetime import datetime, timedelta
 from .forms import ArticleForm, ContactForm
-
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import PasswordChangeView
+from django.contrib.auth.forms import PasswordChangeForm
 
 def home(request):
     return HttpResponse("这是博客系统首页！")
@@ -19,10 +23,10 @@ def post_detail(request, id):
     return HttpResponse(f"这是第{id}篇文章")
 def index(request):
     context = {
-        'title': '我的博客',
+        'title': '首页',
         'posts': ['文章1', '文章2', '文章3']
     }
-    return render(request, 'blog/home.html',context)
+    return render(request, 'blog/home.html', context)
 
 @method_decorator(csrf_exempt, name='dispatch')  #暂时关闭 CSRF 检查,生产环境不要用！容易被攻击！
 class HomeView(View):
@@ -33,7 +37,7 @@ class HomeView(View):
         return HttpResponse("这是 post 请求")
 
 class AboutView(TemplateView):
-    template_name = 'blog/about.html' # 指定模板文件
+    template_name = 'blog/about.html'  # 指定模板文件
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = '关于我们'
@@ -42,13 +46,13 @@ class AboutView(TemplateView):
 
 class ArticleListView(ListView):
     model = Article              # 指定模型
-    template_name = 'blog/article_list.html' # 自定义模板
+    template_name = 'blog/article_list.html'  # 自定义模板
     context_object_name = 'articles' # 模板中用的变量名
     paginate_by = 3 # 分页：每页5条
 
 class ArticleDetailView(DetailView):
     model = Article              # 指定模型
-    template_name = 'blog/article_detail.html' # 自定义模板
+    template_name = 'blog/article_detail.html'  # 自定义模板
     context_object_name = 'article' # 模板中用的变量名
     pk_url_kwarg = 'id'  # 如果 URL 中是 <int:id>
 
@@ -95,7 +99,15 @@ def article_one(request):
 
 # 在视图中使用表单
 #  这就是经典的 **“GET 显示，POST 处理”** 模式。
+
+
+# 用 `@login_required` 装饰器！登录后才能访问
+# - 未登录用户访问 `/create/` → 自动跳转到登录页
+# - 登录成功后 → 自动回到 `/create/`
+@login_required
 def create_article(request):
+    user = request.user
+    print(f"现在登录的用户是：{user}")
     if request.method == 'POST':
         # 用户提交数据，绑定表单
         form = ArticleForm(request.POST)
@@ -111,7 +123,7 @@ def create_article(request):
         form = ArticleForm()
     return render(request, 'blog/create_article.html', {'form': form})
 
-def Contace(request):
+def Contact(request):
     if request.method == "POST":
         # 用户提交了表单，绑定数据
         form = ContactForm(request.POST)
@@ -136,4 +148,3 @@ def Contace(request):
         form = ContactForm()
 
     return render(request, 'blog/contact.html', {'form': form})
-

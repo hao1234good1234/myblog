@@ -22,8 +22,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),   # 管理后台
     # 修改主路由，添加 blog 应用
     # 主路由用 `include()` 分发
-    # 把 /blog/ 下的所有请求交给 blog.urls 处理
-    # `/blog/``blog.urls` → `views.home`
-    # `/blog/3/``blog.urls` → `views.post_detail(id=3)`
+    # 把 /blog/ 下的所有请求交给 blog.urls 处理，`/blog/``blog.urls` → `views.home`，`/blog/3/``blog.urls` → `views.post_detail(id=3)`
+    # 博客路由
     path('blog/', include('blog.urls')),
+
+    # 认证路由
+    path('accounts/', include('accounts.urls')),
 ]

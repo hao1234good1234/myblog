@@ -1,6 +1,4 @@
 from django import forms
-from pyexpat.errors import messages
-
 from .models import Article
 
 
@@ -47,3 +45,5 @@ class ContactForm(forms.Form):
         if len(message) < 10:
             raise forms.ValidationError('留言数字不能小于 10 个字')
         return message
+
+

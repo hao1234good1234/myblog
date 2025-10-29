@@ -1,6 +1,8 @@
 from django.urls import path
 from . import views
 from .views import HomeView, AboutView, ArticleListView, ArticleDetailView
+from django.contrib.auth.views import LogoutView
+from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
 # 创建应用的分路由
 urlpatterns = [
     path('', views.home, name='home'),
@@ -12,5 +14,5 @@ urlpatterns = [
     path('list/',views.article_list, name="article_list"),
     path('one/',views.article_one, name="article_one"),
     path('create/', views.create_article, name="create_article"),
-    path('contact/', views.Contace, name="contact"),
+    path('contact/', views.Contact, name="contact"),
 ]

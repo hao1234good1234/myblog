@@ -122,3 +122,7 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_URL = '/accounts/login/' # 默认重定向的登录 URL
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # 打印邮件到控制台，而不是真正发送

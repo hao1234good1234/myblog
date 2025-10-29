@@ -1,5 +1,15 @@
 <h1>所有文章</h1>
-<ul>
+<nav>
+        <a href="{% url 'article_list' %}">首页</a>
+
+        {% if user.is_authenticated %}
+            <!-- 用户已登录，显示用户名和登出按钮 -->
+            <span>欢迎，{{ user.username }}!</span>
+            <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit">登出</button>
+    </form>
+            <ul>
   {% for article in articles %}
     <li>
       <h2>{{ article.title }}</h2>
@@ -10,3 +20,10 @@
     <li>暂无文章</li>
   {% endfor %}
 </ul>
+        {% else %}
+            <!-- 用户未登录，显示登录/注册 -->
+            <a href="{% url 'login' %}">登录</a>
+            <a href="{% url 'register' %}">注册</a>
+        {% endif %}
+    </nav>
+
