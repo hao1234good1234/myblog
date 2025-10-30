@@ -4,6 +4,8 @@ from .views import HomeView, AboutView, ArticleListView, ArticleDetailView
 from django.contrib.auth.views import LogoutView
 from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
 # 创建应用的分路由
+# `app_name = 'blog'` 告诉 Django：“这个 URL 集合属于 `blog` 应用”
+app_name = 'blog'  # 如果要使用 <a href="{% url 'blog:article_list' %}">返回列表</a> 或 return redirect('blog:article_list') 必须加上这一行！
 urlpatterns = [
     path('', views.home, name='home'),
     path('<int:id>/', views.post_detail, name='post_detail'),
@@ -15,4 +17,7 @@ urlpatterns = [
     path('one/',views.article_one, name="article_one"),
     path('create/', views.create_article, name="create_article"),
     path('contact/', views.Contact, name="contact"),
+    path('update/<int:id>/', views.update_article, name="update_article"),
+    path('delete/<int:id>/', views.delete_article, name="delete_article"),
+    path('publish/<int:id>/', views.publish_article, name="publish_article")
 ]

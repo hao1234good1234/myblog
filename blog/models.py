@@ -6,6 +6,7 @@ class Article(models.Model):
     content = models.TextField( verbose_name='正文', help_text='请输入文章内容')
     created_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间', )
     updated_time = models.DateTimeField(auto_now=True, verbose_name='更新时间')
+    published_time = models.DateTimeField(null=True, blank=True, verbose_name='发布时间')
     author = models.ForeignKey(User, default=1, on_delete=models.CASCADE, verbose_name="作者")  # 关联作者，`on_delete=models.CASCADE`：用户删除时，他的文章也一起删除
     is_published = models.BooleanField(default=True, verbose_name="是否发布")
 
@@ -16,8 +17,13 @@ class Article(models.Model):
     # 在后台、调试、关联字段中都会显示标题，而不是 `Article object`。
     def __str__(self):
         return self.title
+
     class Meta:
-        verbose_name = '文章'
+        verbose_name = '文章(meta)'
         verbose_name_plural = '文章列表'  # 后台显示的复数名称
         ordering = ['-created_time'] # 按创建时间倒序排列, 负号表示倒序，最新的文章排在前面。
         db_table = 'blog_articles'  # 自定义表名（可选）
+        permissions = [
+            ("can_publish", "可以发布文章"),
+            ("can_pin", "可以置顶文章"),
+        ]

@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.template.context_processors import request
 from django.views import View
 from django.views.generic import TemplateView, ListView, DetailView
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from .models import Article
@@ -13,14 +13,21 @@ from datetime import datetime, timedelta
 from .forms import ArticleForm, ContactForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib import messages
+from django.utils import timezone
+
 
 def home(request):
     return HttpResponse("这是博客系统首页！")
+
+
 def post_detail(request, id):
     return HttpResponse(f"这是第{id}篇文章")
+
+
 def index(request):
     context = {
         'title': '首页',
@@ -28,33 +35,40 @@ def index(request):
     }
     return render(request, 'blog/home.html', context)
 
-@method_decorator(csrf_exempt, name='dispatch')  #暂时关闭 CSRF 检查,生产环境不要用！容易被攻击！
+
+@method_decorator(csrf_exempt, name='dispatch')  # 暂时关闭 CSRF 检查,生产环境不要用！容易被攻击！
 class HomeView(View):
     # http_method_names = ['get', 'post']   # ✅ 显式允许 POST
     def get(self, request):
         return HttpResponse("这是 get 请求")
+
     def post(self, request):
         return HttpResponse("这是 post 请求")
 
+
 class AboutView(TemplateView):
     template_name = 'blog/about.html'  # 指定模板文件
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = '关于我们'
         context['posts'] = ['电话', '邮箱', '许可证']
         return context
 
+
 class ArticleListView(ListView):
-    model = Article              # 指定模型
+    model = Article  # 指定模型
     template_name = 'blog/article_list.html'  # 自定义模板
-    context_object_name = 'articles' # 模板中用的变量名
-    paginate_by = 3 # 分页：每页5条
+    context_object_name = 'articles'  # 模板中用的变量名
+    paginate_by = 3  # 分页：每页5条
+
 
 class ArticleDetailView(DetailView):
-    model = Article              # 指定模型
+    model = Article  # 指定模型
     template_name = 'blog/article_detail.html'  # 自定义模板
-    context_object_name = 'article' # 模板中用的变量名
+    context_object_name = 'article'  # 模板中用的变量名
     pk_url_kwarg = 'id'  # 如果 URL 中是 <int:id>
+
 
 def article_list(request):
     # 返回的是QuerySet，它的特点有：
@@ -69,11 +83,10 @@ def article_list(request):
     # articles = Article.objects.order_by('title')  # 按标题升序
     # articles = Article.objects.order_by('is_published', '-created_time')
 
+    # 方法1：all
+    articles = Article.objects.all()  # 获取所有对象
 
-    #方法1：all
-    articles = Article.objects.all() # 获取所有对象
-
-    #方法2：filter ,支持 `__` 双下划线语法，比如 `author__username` 表示“作者的用户名”
+    # 方法2：filter ,支持 `__` 双下划线语法，比如 `author__username` 表示“作者的用户名”
     # articles = Article.objects.filter(is_published=True)    #过滤符合条件的对象
     # articles = Article.objects.filter(author__username='admin') # 按作者过滤
     # today = datetime.now().date()
@@ -92,8 +105,9 @@ def article_list(request):
     # articles = Article.objects.exclude(author__username__in=['Alice', 'test'])
     return render(request, 'blog/article_list.html', {'articles': articles})
 
+
 def article_one(request):
-    article = Article.objects.get(pk=3)  #获取唯一一个对象, pk是主键
+    article = Article.objects.get(pk=3)  # 获取唯一一个对象, pk是主键
     return render(request, 'blog/article_detail.html', {'article': article})
 
 
@@ -105,23 +119,29 @@ def article_one(request):
 # - 未登录用户访问 `/create/` → 自动跳转到登录页
 # - 登录成功后 → 自动回到 `/create/`
 @login_required
+@permission_required('blog.add_article', raise_exception=True)
 def create_article(request):
-    user = request.user
-    print(f"现在登录的用户是：{user}")
+    # 方式1：在代码中使用has_perm来判断权限
+    if not request.user.has_perm('blog.add_article'):
+        return HttpResponse("您没有权限创建文章！")
     if request.method == 'POST':
         # 用户提交数据，绑定表单
         form = ArticleForm(request.POST)
         if form.is_valid():
             # 验证通过
-            article = form.save(commit=False) # 先不保存
-            article.author = request.user # 设置作者
-            article.save() # 保存到数据库
-            return redirect('article_list') # 重定向到列表页，articles是路由别名
+            article = form.save(commit=False)  # 先不保存
+            # 如果发布勾选了，需要设置发布时间
+            if form.cleaned_data['is_published']:
+                article.published_time = timezone.now()
+            article.author = request.user  # 设置作者
+            article.save()  # 保存到数据库
+            return redirect('blog:article_list')  # 重定向到列表页，articles是路由别名
 
     else:
         # GET 请求，显示空表单
         form = ArticleForm()
     return render(request, 'blog/create_article.html', {'form': form})
+
 
 def Contact(request):
     if request.method == "POST":
@@ -142,9 +162,58 @@ def Contact(request):
             # 示例：打印到控制台
             print(f"收到留言：{name} ({email}) 说：{message}")
             # 处理完成后重定向，防止重复提交
-            return redirect('home')  # 假设你有一个成功页面
+            return redirect('blog:article_list')  # 假设你有一个成功页面
     else:
         # GET 请求，显示空表单
         form = ContactForm()
 
     return render(request, 'blog/contact.html', {'form': form})
+
+
+# 更新文章
+@login_required
+@permission_required('blog.change_article', raise_exception=True)
+def update_article(request, id):
+    article = get_object_or_404(Article, pk=id)
+    if request.method == 'POST':
+        form = ArticleForm(request.POST, instance=article)
+        if form.is_valid():
+            article = form.save(commit=False)  # 先不保存
+            # 如果发布勾选了，需要设置发布时间
+            if form.cleaned_data['is_published']:
+                article.published_time = timezone.now()
+            article.save()
+            return redirect('blog:article_list')
+    else:
+        form = ArticleForm(instance=article)
+    return render(request, 'blog/update_article.html', {'form': form})
+
+
+# 删除文章
+@login_required
+def delete_article(request, id):
+    article = get_object_or_404(Article, pk=id)
+    # 检查权限：只有管理员和文章作者才能删除文章
+    if not request.user.has_perm('blog.delete_article') and article.author != request.user:
+        messages.error(request, '您没有权限删除此文章！')
+        return redirect('blog:article_list')
+    if request.method == 'POST':
+        title = article.title
+        article.delete()
+        messages.success(request, f'文章"{title}"已成功删除！')
+        return redirect('blog:article_list')
+    return render(request, 'blog/delete_article.html', {'article': article})
+
+
+@login_required
+def publish_article(request, id):
+    article = get_object_or_404(Article, pk=id)
+    # 检查权限：只有管理员和文章作者才能发布文章
+    if not request.user.has_perm('blog.can_publish') and article.author != request.user:
+        messages.error(request, '您没有权限发布此文章！')
+        return redirect('blog:article_list')
+    article = get_object_or_404(Article, pk=id)
+    article.is_published = True
+    article.published_time = timezone.now()
+    article.save()
+    return redirect('blog:article_list')

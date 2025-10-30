@@ -1,0 +1,79 @@
+<!-- templates/blog/delete_article.html -->
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>确认删除 - 博客系统</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .warning {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .btn-group {
+            margin: 20px 0;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.9;
+        }
+        .back-link {
+            display: block;
+            margin-top: 10px;
+            color: #666;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            color: #000;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>确认删除文章？</h1>
+
+    <div class="warning">
+        <strong>警告：</strong>此操作不可撤销！删除后无法恢复。
+    </div>
+
+    <p><strong>标题：</strong>{{ article.title }}</p>
+    <p><strong>作者：</strong>{{ article.author }}</p>
+    <p><strong>创建时间：</strong>{{ article.created_time }}</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="btn-group">
+            <button type="submit" class="btn btn-danger">确认删除</button>
+            <a href="{% url 'blog:article_list' %}" class="btn btn-secondary">取消</a>
+        </div>
+    </form>
+
+    <a href="{% url 'blog:article_list' %}" class="back-link">← 返回文章列表</a>
+</body>
+</html>

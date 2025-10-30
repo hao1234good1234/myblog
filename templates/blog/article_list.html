@@ -1,29 +1,48 @@
 <h1>所有文章</h1>
 <nav>
-        <a href="{% url 'article_list' %}">首页</a>
+    <a href="{% url 'blog:article_list' %}">首页</a>
 
-        {% if user.is_authenticated %}
-            <!-- 用户已登录，显示用户名和登出按钮 -->
-            <span>欢迎，{{ user.username }}!</span>
-            <form method="post" action="{% url 'logout' %}">
-        {% csrf_token %}
-        <button type="submit">登出</button>
-    </form>
-            <ul>
-  {% for article in articles %}
-    <li>
-      <h2>{{ article.title }}</h2>
-      <p>{{ article.content|truncatewords:30 }}</p>
-      <small>发布时间：{{ article.created_time }}</small>
-    </li>
-  {% empty %}
-    <li>暂无文章</li>
-  {% endfor %}
-</ul>
-        {% else %}
-            <!-- 用户未登录，显示登录/注册 -->
-            <a href="{% url 'login' %}">登录</a>
-            <a href="{% url 'register' %}">注册</a>
-        {% endif %}
-    </nav>
+    {% if user.is_authenticated %}
+        <!-- 用户已登录，显示用户名和登出按钮 -->
+        <span>欢迎，{{ user.username }}!</span>
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit">登出</button>
+        </form>
+        <ul>
+            {% if perms.blog.add_article %}
+                <a href="{% url 'blog:create_article' %}">写新文章</a>
+            {% endif %}
+            {% for article in articles %}
+                <li>
+                    <h2>{{ article.title }}</h2>
+                    <p>{{ article.content|truncatewords:30 }}</p>
+                    {% if article.is_published %}
+                        <small>发布时间：{{ article.published_time }}</small>
+                    {% else %}
+                        <small>未发布</small>
+                    {% endif %}
+                </li>
+                {% if article.author == user or perms.blog.change_article %}
+                    <a href="{% url 'blog:update_article' article.pk %}">编辑</a>
+                {% endif %}
+                {% if article.author == user or perms.blog.delete_article %}
+                    <a href="{% url 'blog:delete_article' article.pk %}">删除</a>
+                {% endif %}
+                {% if not article.is_published %}
+                    {% if article.author == user or perms.blog.can_publish %}
+                        <a href="{% url 'blog:publish_article' article.pk %}">发布</a>
+                    {% endif %}
+                {% endif %}
+
+            {% empty %}
+                <li>暂无文章</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <!-- 用户未登录，显示登录/注册 -->
+        <a href="{% url 'login' %}">登录</a>
+        <a href="{% url 'register' %}">注册</a>
+    {% endif %}
+</nav>
 

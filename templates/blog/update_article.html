@@ -1,0 +1,100 @@
+<!-- templates/blog/update_article.html -->
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑文章 - 博客系统</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 200px;
+            resize: vertical;
+        }
+        .btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 10px;
+            color: #666;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            color: #000;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>编辑文章</h1>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="{{ form.title.id_for_label }}">标题：</label>
+            {{ form.title }}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.content.id_for_label }}">内容：</label>
+            {{ form.content }}
+        </div>
+        <div class="form-group">
+            <label for="{{ form.summary.id_for_label }}">摘要(可选)：</label>
+            {{ form.summary }}
+        </div>
+
+        <input type="checkbox" name="is_published" id="is_published" checked>是否发布</input>
+        <br>
+
+        <button type="submit" class="btn">保存修改</button>
+    </form>
+
+    <a href="{% url 'blog:article_list' %}" class="back-link">← 返回文章列表</a>
+</body>
+<!-- 显示错误信息 -->
+<!-- 方法1：显示所有非字段错误 -->
+{{ form.non_field_errors }}
+<!-- 方法2：遍历每个字段 -->
+{% for field in form %}
+    {% if field.errors %}
+            <div class="error">{{ field.errors }}</div>  <!-- 显示每个字段的错误 -->
+        {% endif %}
+{% endfor %}
+<!-- 方法3：CSS 样式控制 -->
+<style>
+    .errorlist { color: red; }
+    input.error { border: 1px solid red; }
+</style>
+</html>
