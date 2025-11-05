@@ -13,8 +13,11 @@ from .models import Article
 class ArticleForm(forms.ModelForm):
     class Meta:
         model = Article
-        fields = ['title', 'content', 'is_published', 'summary'] # 要包含的字段
+        fields = ['title', 'content', 'is_published', 'summary', 'cover'] # 要包含的字段
         exclude = ['author']   # 或者排除某些字段
+        widgets = {
+            'cover': forms.ClearableFileInput(),  # 自动带“清除”复选框
+        }
 
     # 字段级验证：`clean_字段名()`
     def clean_title(self):

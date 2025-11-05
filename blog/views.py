@@ -18,6 +18,9 @@ from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib import messages
 from django.utils import timezone
+import os
+from django.conf import settings
+
 
 
 def home(request):
@@ -126,7 +129,8 @@ def create_article(request):
         return HttpResponse("您没有权限创建文章！")
     if request.method == 'POST':
         # 用户提交数据，绑定表单
-        form = ArticleForm(request.POST)
+        # **Django 表单无法从 `request.POST` 中获取文件数据 —— 文件数据单独放在 `request.FILES` 里，必须显式传入表单。**
+        form = ArticleForm(request.POST, request.FILES)
         if form.is_valid():
             # 验证通过
             article = form.save(commit=False)  # 先不保存
@@ -176,13 +180,13 @@ def Contact(request):
 def update_article(request, id):
     article = get_object_or_404(Article, pk=id)
     if request.method == 'POST':
-        form = ArticleForm(request.POST, instance=article)
+        form = ArticleForm(request.POST, request.FILES, instance=article)
         if form.is_valid():
             article = form.save(commit=False)  # 先不保存
             # 如果发布勾选了，需要设置发布时间
             if form.cleaned_data['is_published']:
                 article.published_time = timezone.now()
-            article.save()
+            article.save()  # Django 自动处理文件上传/替换/删除
             return redirect('blog:article_list')
     else:
         form = ArticleForm(instance=article)

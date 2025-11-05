@@ -17,6 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include  # 注意：导入 include
 from blog import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('', views.index),  # 主页
@@ -30,3 +32,6 @@ urlpatterns = [
     # 认证路由
     path('accounts/', include('accounts.urls')),
 ]
+# 开发环境下提供媒体文件服务，是通过Django提供文件，Django 处理文件很慢、不安全，生产环境需要使用NGINX来直接提供文件服务
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) #加的这条规则就是：“`/media/` 开头的请求，去 `MEDIA_ROOT` 找文件”

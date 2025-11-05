@@ -1,7 +1,8 @@
 <h1>写文章</h1>
-<form method="post">
+<form method="post" enctype="multipart/form-data">
     {% csrf_token %}  <!-- 安全：防止 CSRF 攻击 -->
-    {{ form.as_p }}  <!-- 自动生成所有字段，用 <p> 包裹 -->
+    <!-- 自动生成所有字段，用 <p> 包裹 -->
+    {{ form.as_p }}
     <button type="submit">发布文章</button>
 </form>
 <!-- 显示错误信息 -->
@@ -10,11 +11,16 @@
 <!-- 方法2：遍历每个字段 -->
 {% for field in form %}
     {% if field.errors %}
-            <div class="error">{{ field.errors }}</div>  <!-- 显示每个字段的错误 -->
-        {% endif %}
+        <div class="error">{{ field.errors }}</div>  <!-- 显示每个字段的错误 -->
+    {% endif %}
 {% endfor %}
 <!-- 方法3：CSS 样式控制 -->
 <style>
-    .errorlist { color: red; }
-    input.error { border: 1px solid red; }
+    .errorlist {
+        color: red;
+    }
+
+    input.error {
+        border: 1px solid red;
+    }
 </style>

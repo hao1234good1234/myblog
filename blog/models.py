@@ -1,5 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
+import os
+from django.conf import settings
+import logging
+logger = logging.getLogger(__name__)
 
 class Article(models.Model):
     title = models.CharField(max_length=200, verbose_name='标题', help_text="请输入文章标题")
@@ -10,7 +14,17 @@ class Article(models.Model):
     author = models.ForeignKey(User, default=1, on_delete=models.CASCADE, verbose_name="作者")  # 关联作者，`on_delete=models.CASCADE`：用户删除时，他的文章也一起删除
     is_published = models.BooleanField(default=True, verbose_name="是否发布")
 
-    summary = models.CharField(max_length=300, verbose_name='摘要', null=True, blank=True, help_text='请输入文章摘要（可选）')
+    summary = models.CharField(max_length=300, verbose_name='摘要(可选)', null=True, blank=True, help_text='请输入文章摘要')
+
+    #上传图片
+    # - `upload_to='covers/'`：文件会保存到 `MEDIA_ROOT/covers/`
+    # - `blank=True, null=True`：允许不上传
+    # cover = models.ImageField(upload_to='covers/', blank=True, null=True, verbose_name='封面(可选)')
+
+    def cover_path(self, filename):  # ← 改成类方法！
+        author_id = getattr(self.author, 'id', 'unknown')
+        return f'covers/{author_id}/{filename}'
+    cover = models.ImageField(upload_to=cover_path, blank=True, null=True, verbose_name='封面(可选)')
 
     # 控制对象显示名
     # 默认情况下，Django 显示对象为 `Article object (1)`，不友好。我们用 `__str__()` 让它显示为文章标题
@@ -27,3 +41,7 @@ class Article(models.Model):
             ("can_publish", "可以发布文章"),
             ("can_pin", "可以置顶文章"),
         ]
+
+def cover_path(instance, filename):  # ← 没有 self！
+    author_id = getattr(instance.author, 'id', 'unknown')
+    return f'covers/{author_id}/{filename}'

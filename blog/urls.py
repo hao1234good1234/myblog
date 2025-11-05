@@ -13,7 +13,7 @@ urlpatterns = [
     path('about/', AboutView.as_view()),
     path('articles/', ArticleListView.as_view(), name='articles'), #name的作用是给路由起一个名字，方便后续引用。
     path('articles/<int:id>/', ArticleDetailView.as_view(), name='article_detail'),  # 这里的 id 必须和 ArticleDetailView中的pk_url_kwarg的值 id 名字对应一致！
-    path('list/',views.article_list, name="article_list"),
+    path('list/',views.article_list, name="article_list"), # 这个才是主页
     path('one/',views.article_one, name="article_one"),
     path('create/', views.create_article, name="create_article"),
     path('contact/', views.Contact, name="contact"),

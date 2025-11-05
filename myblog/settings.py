@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -126,3 +127,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/accounts/login/' # 默认重定向的登录 URL
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # 打印邮件到控制台，而不是真正发送
+
+# 媒体文件设置
+# - `MEDIA_URL`：浏览器访问路径，如 `http://127.0.0.1:8000/media/covers/xxx.jpg`
+# - `MEDIA_ROOT`：文件实际存储位置（项目根目录下的 `media` 文件夹）
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
