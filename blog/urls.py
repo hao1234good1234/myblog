@@ -19,5 +19,7 @@ urlpatterns = [
     path('contact/', views.Contact, name="contact"),
     path('update/<int:id>/', views.update_article, name="update_article"),
     path('delete/<int:id>/', views.delete_article, name="delete_article"),
-    path('publish/<int:id>/', views.publish_article, name="publish_article")
+    path('publish/<int:id>/', views.publish_article, name="publish_article"),
+
+    path('test404/', views.test_404, name="test_404"),
 ]

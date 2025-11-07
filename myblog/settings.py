@@ -28,6 +28,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# 测试自定义异常的时候需要将下面的代码取消注释
+# DEBUG = False  # ← 只有 DEBUG=False 时，Django 才会使用 404.html / 500.html
+# ALLOWED_HOSTS = ['127.0.0.1']
+
 
 # Application definition
 
@@ -38,17 +42,21 @@ INSTALLED_APPS = [
     'django.contrib.sessions',      # 会话支持
     'django.contrib.messages',       # 消息框架
     'django.contrib.staticfiles',    # 静态文件支持
-    'blog',   # 添加自己新建的应用
+    # 'blog',   # 添加自己新建的应用
+    'blog.apps.BlogConfig', # Django 启动时就会注册信号！
 ]
 
 MIDDLEWARE = [
+    # 'myblog.middleware.IPBlockMiddleWare', # 拦截请求限制IP
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'myblog.middleware.LogMiddleWare', # 记录请求耗时
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'myblog.middleware.AddHeaderMiddleWare', # 给所有响应添加自定义头
 ]
 
 ROOT_URLCONF = 'myblog.urls'
@@ -134,3 +142,13 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # 打印邮件�
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# redis缓存
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}

@@ -20,7 +20,11 @@ from django.contrib import messages
 from django.utils import timezone
 import os
 from django.conf import settings
+from django.http import Http404
+from django.views.decorators.cache import cache_page
+from django.core.cache import cache
 
+from .signals import user_liked
 
 
 def home(request):
@@ -73,6 +77,7 @@ class ArticleDetailView(DetailView):
     pk_url_kwarg = 'id'  # 如果 URL 中是 <int:id>
 
 
+# @cache_page(60 * 5) # 整页缓存 缓存5分钟
 def article_list(request):
     # 返回的是QuerySet，它的特点有：
     # 1. 惰性求值，查询不会立即执行，真的需要的时候再执行，避免不必要的查询。
@@ -87,7 +92,7 @@ def article_list(request):
     # articles = Article.objects.order_by('is_published', '-created_time')
 
     # 方法1：all
-    articles = Article.objects.all()  # 获取所有对象
+    # articles = Article.objects.all()  # 获取所有对象
 
     # 方法2：filter ,支持 `__` 双下划线语法，比如 `author__username` 表示“作者的用户名”
     # articles = Article.objects.filter(is_published=True)    #过滤符合条件的对象
@@ -106,6 +111,26 @@ def article_list(request):
     # 方法3：exclude
     # articles = Article.objects.exclude(is_published=True)
     # articles = Article.objects.exclude(author__username__in=['Alice', 'test'])
+
+    # 方法4：分页
+    # articles = Article.objects.all()[:5] # 前5篇
+    # articles = Article.objects.all()[5:10] # 第6到第10篇
+
+    if not request.user.is_authenticated:
+        # 匿名用户：缓存公共的
+        cache_key = "blog:anonymous:article_list"
+        articles = cache.get(cache_key)
+        if articles is None:
+            articles = Article.objects.filter(is_published=True)
+            cache.set(cache_key, articles, 60 * 5)
+    else:
+        # 已登录用户：缓存公共的和自己特有的
+        cache_key = f"blog:{request.user.id}:article_list"
+        articles = cache.get(cache_key)
+        if articles is None:
+            articles = Article.objects.filter(is_published=True) | Article.objects.filter(author=request.user)
+            articles = articles.distinct()
+            cache.set(cache_key, articles, 60 * 5)  # 缓存5分钟
     return render(request, 'blog/article_list.html', {'articles': articles})
 
 
@@ -221,3 +246,15 @@ def publish_article(request, id):
     article.published_time = timezone.now()
     article.save()
     return redirect('blog:article_list')
+
+
+def test_404(request):
+    raise Http404("测试404页面")
+
+
+def like_article(request, id):
+    # 处理点赞
+    article = get_object_or_404(Article, pk=id)
+    # ... 处理点赞逻辑（比如加 likes 计数）...
+    # 👇 触发自定义信号
+    user_liked.send(sender=Article, user=request.user, article=article)

@@ -48,6 +48,25 @@
         <!-- 用户未登录，显示登录/注册 -->
         <a href="{% url 'login' %}">登录</a>
         <a href="{% url 'register' %}">注册</a>
+
+        {% for article in articles %}
+            <li>
+                {% if article.cover %}
+                    <img src="{{ article.cover.url }}" alt="封面" width="200"/>
+                {% else %}
+                    <p>无封面</p>
+                {% endif %}
+                <h2>{{ article.title }}</h2>
+                <p>{{ article.content|truncatewords:30 }}</p>
+                {% if article.is_published %}
+                    <small>发布时间：{{ article.published_time }}</small>
+                {% else %}
+                    <small>未发布</small>
+                {% endif %}
+            </li>
+        {% empty %}
+            <li>暂无文章</li>
+        {% endfor %}
     {% endif %}
 </nav>
 
