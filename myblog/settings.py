@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os
 
+from decouple import config  # pip install python-decouple
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -21,7 +23,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-!lle$4r!3pu-b#5%1*q8)of@4n+8!s2pu%6k)l5ha4__^xx2ct'
+# - 加密 session
+# - 生成 CSRF token
+# - 签名密码重置链接等
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -47,8 +52,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware', # 安全中间件（必须在最前面）
     # 'myblog.middleware.IPBlockMiddleWare', # 拦截请求限制IP
-    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'myblog.middleware.LogMiddleWare', # 记录请求耗时
     'django.middleware.common.CommonMiddleware',
@@ -124,8 +129,21 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
-
+# 静态文件 URL（浏览器访问路径）
 STATIC_URL = 'static/'
+# 开发时：额外静态文件目录（比如全局 CSS/JS），Django 额外搜索静态文件的目录（开发用）
+STATICFILES_DIRS = [
+    BASE_DIR / "static", # 项目根目录下的static文件夹
+]
+
+# 生产时：collectstatic 收集到的目标目录
+if os.environ.get("DJANGO_ENV") == 'production':
+    STATIC_ROOT = BASE_DIR / "staticfiles" #  或 "/var/www/myproject/static/"
+else:
+    STATIC_ROOT = None # 开发时不设置
+
+# - 开发：`python manage.py runserver` 自动服务 `app/static/` 和 `static/`
+# - 生产：设置 `DJANGO_ENV=production`，然后运行 `collectstatic`
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -152,3 +170,22 @@ CACHES = {
         }
     }
 }
+
+
+# HTTPS 相关（如果你用 HTTPS）
+# SECURE_HSTS_PRELOAD = True
+# SECURE_HSTS_SECONDS = 31536000  # 1年
+# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+# SECURE_SSL_REDIRECT = True      # 强制跳转 HTTPS,本地开发不要开 `SECURE_SSL_REDIRECT`，否则会重定向失败！
+# SESSION_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True
+
+# 上线必须设为 False！
+# DEBUG = False
+
+# 允许的域名（防止 Host 头攻击）
+# ALLOWED_HOSTS = ['yourdomain.com', 'www.yourdomain.com', '127.0.0.1']
+
+# 防止点击劫持
+# SECURE_REFERRER_POLICY = 'same-origin'
+

@@ -22,4 +22,7 @@ urlpatterns = [
     path('publish/<int:id>/', views.publish_article, name="publish_article"),
 
     path('test404/', views.test_404, name="test_404"),
+
+    path('async/', views.async_view, name='async'),  # 异步视图
+
 ]

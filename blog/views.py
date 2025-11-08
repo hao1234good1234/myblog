@@ -1,7 +1,7 @@
 # 编写视图函数
 from http.client import responses
 
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.template.context_processors import request
 from django.views import View
 from django.views.generic import TemplateView, ListView, DetailView
@@ -25,6 +25,8 @@ from django.views.decorators.cache import cache_page
 from django.core.cache import cache
 
 from .signals import user_liked
+
+import asyncio
 
 
 def home(request):
@@ -258,3 +260,13 @@ def like_article(request, id):
     # ... 处理点赞逻辑（比如加 likes 计数）...
     # 👇 触发自定义信号
     user_liked.send(sender=Article, user=request.user, article=article)
+
+async def async_view(request):
+    await asyncio.sleep(2) # 模拟异步 I/O（如调用 API）
+    title = await get_article() # 如果需要立即获取数据，必须加await
+    return JsonResponse({"title": title, "message": "hello from async view"})
+
+# 异步查询（必须在 async 函数中）
+async def get_article():
+    article = await Article.objects.aget(id=37) # 注意是aget()
+    return article.title
