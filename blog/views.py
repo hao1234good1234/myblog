@@ -1,5 +1,5 @@
 # 编写视图函数
-from http.client import responses
+from http.client import responses, HTTPException
 
 from django.http import HttpResponse, JsonResponse
 from django.template.context_processors import request
@@ -270,3 +270,17 @@ async def async_view(request):
 async def get_article():
     article = await Article.objects.aget(id=37) # 注意是aget()
     return article.title
+# def publish_article(request, pk):
+#     article = get_object_or_404(Article, pk = pk)
+#     user_id = request.user.id
+#     if not user_id:
+#         print(f"{request.path} 的请求用户为空")
+#         raise HTTPException("user id is null")
+#     else:
+#         print(f"publish article")
+#         article.is_published = True
+#         is_update = Article.objects.update(article)
+#         if is_update:
+#             print(f"{article.id}has published")
+#         else:
+#             raise HTTPException(f"has error when update article{article.id}")

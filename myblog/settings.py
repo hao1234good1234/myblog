@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 
 from decouple import config  # pip install python-decouple
+from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -189,3 +190,16 @@ CACHES = {
 # 防止点击劫持
 # SECURE_REFERRER_POLICY = 'same-origin'
 
+# === Celery 配置 ===
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0' #任务队列地址
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/0' #结果存储地址
+CELERY_ACCEPT_CONTENT = ['json'] #接受的消息格式
+CELERY_TASK_SERIALIZER = 'json' #任务参数序列化格式
+CELERY_RESULT_SERIALIZER = 'json' #结果序列化格式
+CELERY_TIMEZONE = 'Asia/Shanghai' #Celery 时区 ⚠️ 定时任务必需
+USE_TZ = True  #Django 时区支持 建议开启时区支持
+#  如果你后续想用定时任务，还可以加：
+# 定时任务列表 按需添加
+CELERY_BEAT_SCHEDULE = {
+    # 示例：每天凌晨清理任务（稍后可扩展）
+}

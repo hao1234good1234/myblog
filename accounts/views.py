@@ -5,6 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.forms import PasswordChangeForm
+from accounts.tasks import send_welcome_email
 
 # 创建登录视图
 def login_view(request):
@@ -32,6 +33,10 @@ def register_view(request):
         if form.is_valid():
             user = form.save() # 自动创建 User 自动加密密码 并保存到数据库
             login(request, user)  # 注册完自动登录
+
+            # 异步发送欢迎邮件（不阻塞响应），立即跳转到article_list页面，发送邮件在后台异步进行
+            send_welcome_email.delay(user.email)
+
             return redirect('blog:article_list')
     else:
         form = RegisterForm()
